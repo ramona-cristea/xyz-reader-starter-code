@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
+import com.example.xyzreader.data.Article;
 import com.example.xyzreader.data.ArticleLoader;
 
 /**
@@ -39,8 +40,8 @@ import com.example.xyzreader.data.ArticleLoader;
  * either contained in a {@link ArticleListActivity} in two-pane mode (on
  * tablets) or a {@link ArticleDetailActivity} on handsets.
  */
-public class ArticleDetailFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class ArticleDetailFragment extends Fragment /*implements
+        LoaderManager.LoaderCallbacks<Cursor>*/ {
     private static final String TAG = "ArticleDetailFragment";
 
     public static final String ARG_ITEM_ID = "item_id";
@@ -61,6 +62,8 @@ public class ArticleDetailFragment extends Fragment implements
     private boolean mIsCard = false;
     private int mStatusBarFullOpacityBottom;
 
+    private Article mArticle;
+
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
@@ -74,21 +77,31 @@ public class ArticleDetailFragment extends Fragment implements
     public ArticleDetailFragment() {
     }
 
-    public static ArticleDetailFragment newInstance(long itemId) {
-        Bundle arguments = new Bundle();
-        arguments.putLong(ARG_ITEM_ID, itemId);
-        ArticleDetailFragment fragment = new ArticleDetailFragment();
-        fragment.setArguments(arguments);
-        return fragment;
+//    public static ArticleDetailFragment newInstance(long itemId) {
+//        Bundle arguments = new Bundle();
+//        arguments.putLong(ARG_ITEM_ID, itemId);
+//        ArticleDetailFragment fragment = new ArticleDetailFragment();
+//        fragment.setArguments(arguments);
+//        return fragment;
+//    }
+
+//    public static ArticleDetailFragment newInstance() {
+//        ArticleDetailFragment fragment = new ArticleDetailFragment();
+//        fragment.setArguments(arguments);
+//        return fragment;
+//    }
+
+    public void setArticleData(Article article) {
+        mArticle = article;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            mItemId = getArguments().getLong(ARG_ITEM_ID);
-        }
+//        if (getArguments().containsKey(ARG_ITEM_ID)) {
+//            mItemId = getArguments().getLong(ARG_ITEM_ID);
+//        }
 
         mIsCard = getResources().getBoolean(R.bool.detail_is_card);
         mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
@@ -108,15 +121,14 @@ public class ArticleDetailFragment extends Fragment implements
         // the fragment's onCreate may cause the same LoaderManager to be dealt to multiple
         // fragments because their mIndex is -1 (haven't been added to the activity yet). Thus,
         // we do this in onActivityCreated.
-        getLoaderManager().initLoader(0, null, this);
+        //getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
-        mDrawInsetsFrameLayout = (DrawInsetsFrameLayout)
-                mRootView.findViewById(R.id.draw_insets_frame_layout);
+        mDrawInsetsFrameLayout = mRootView.findViewById(R.id.draw_insets_frame_layout);
         mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
             @Override
             public void onInsetsChanged(Rect insets) {
@@ -124,18 +136,18 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-        mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
-        mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
-            @Override
-            public void onScrollChanged() {
-                mScrollY = mScrollView.getScrollY();
-                getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
-                mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
-                updateStatusBar();
-            }
-        });
+        mScrollView = mRootView.findViewById(R.id.scrollview);
+//        mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
+//            @Override
+//            public void onScrollChanged() {
+//                mScrollY = mScrollView.getScrollY();
+//                getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
+//                mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
+//                updateStatusBar();
+//            }
+//        });
 
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        mPhotoView = mRootView.findViewById(R.id.photo);
         mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
 
         mStatusBarColorDrawable = new ColorDrawable(0);
@@ -200,11 +212,10 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+        TextView titleView = mRootView.findViewById(R.id.article_title);
+        TextView bylineView = mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-
+        TextView bodyView = mRootView.findViewById(R.id.article_body);
 
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
@@ -261,35 +272,35 @@ public class ArticleDetailFragment extends Fragment implements
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return ArticleLoader.newInstanceForItemId(getActivity(), mItemId);
-    }
+//    @Override
+//    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+//        return ArticleLoader.newInstanceForItemId(getActivity(), mItemId);
+//    }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if (!isAdded()) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            return;
-        }
+//    @Override
+//    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+//        if (!isAdded()) {
+//            if (cursor != null) {
+//                cursor.close();
+//            }
+//            return;
+//        }
+//
+//        mCursor = cursor;
+//        if (mCursor != null && !mCursor.moveToFirst()) {
+//            Log.e(TAG, "Error reading item detail cursor");
+//            mCursor.close();
+//            mCursor = null;
+//        }
+//
+//        bindViews();
+//    }
 
-        mCursor = cursor;
-        if (mCursor != null && !mCursor.moveToFirst()) {
-            Log.e(TAG, "Error reading item detail cursor");
-            mCursor.close();
-            mCursor = null;
-        }
-
-        bindViews();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mCursor = null;
-        bindViews();
-    }
+//    @Override
+//    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+//        mCursor = null;
+//        bindViews();
+//    }
 
     public int getUpButtonFloor() {
         if (mPhotoContainerView == null || mPhotoView.getHeight() == 0) {
