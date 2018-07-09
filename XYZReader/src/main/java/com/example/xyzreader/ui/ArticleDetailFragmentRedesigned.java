@@ -132,7 +132,10 @@ public class ArticleDetailFragmentRedesigned extends Fragment {
                 bylineView.setText(outputFormat.format(publishedDate));
 
             }
-            bodyView.setText(mArticle.getBody());
+            String text = mArticle
+                    .getBody()
+                    .substring(0, 1000);
+            bodyView.setText(text);
             Picasso.get().load(mArticle.getPhoto()).into(target);
         }
     }
